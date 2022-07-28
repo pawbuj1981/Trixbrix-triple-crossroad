@@ -1,0 +1,174 @@
+
+
+#include <Servo.h>
+
+//Servo myservo;  // create servo object to control a servo
+Servo servo1; // Create a servo object
+Servo servo2; // Create a second servo object
+
+// variable to store the servos position
+int pos1;    
+int pos2;
+int sensorPin;
+int value;
+int randomNumber;
+const int time = 8000;
+//serwo 1 kąt
+const int angle1 = 40;//20
+const int angle3 = 10;
+//serwo 2 kąt
+const int angle2 = 40;//20
+const int angle4 = 15;
+
+
+// constants won't change. They're used here to set pin numbers:
+const int buttonPin1 = 2;     // the number of the pushbutton pin
+const int buttonPin2 = 3;     // the number of the pushbutton pin
+const int ledPin1 =  7;      // the number of the LED pin
+const int ledPin2 =  8;      // the number of the LED pin
+
+// variables will change:
+int buttonState1 = 0;         // variable for reading the pushbutton status
+int buttonState2 = 0;         // variable for reading the pushbutton status
+
+int LDRvalue = 0; // save the LDR value at last pass
+unsigned long prevoiusMillis = 0; 
+int lightSensitivy = 500;
+int interval = 5000;
+
+void setup() {
+  
+  //servo   
+  servo1.attach(9);  // attaches the servo on pin 9 to the servo object
+  servo2.attach(10);  // attaches the servo on pin 10 to the servo object
+  servo1.write(angle3);//pozycja startowa   
+  servo2.write(angle4); 
+  randomNumber = 0;
+  
+
+  //photosensors
+  Serial.begin(9600);// initialize serial communication at 9600 bits per second:
+  sensorPin =0; 
+ 
+  
+  // initialize the LED pin as an output:
+  pinMode(ledPin1, OUTPUT);
+  pinMode(ledPin2, OUTPUT);
+ 
+  
+ //buttons
+ 
+  pinMode(buttonPin1, INPUT);// initialize the pushbutton pin as an input:
+  pinMode(buttonPin2, INPUT);// initialize the pushbutton pin as an input:
+  //digitalWrite(2, HIGH); //enable pullups to make pin high
+  
+}
+
+void loop() {
+   
+  //read the state of the pushbutton value:
+  buttonState1 = digitalRead(buttonPin1);
+  buttonState2 = digitalRead(buttonPin2); 
+ //randomNumber = random(3);
+ value = analogRead(sensorPin);
+ Serial.print("Sensor :");
+ Serial.println(value);
+ //Serial.println(randomNumber);
+ delay(100);
+
+  
+  //zwrotnica i serwa
+  
+  if (value > 200)
+  {    
+     digitalWrite(ledPin1, HIGH);
+    digitalWrite(ledPin2, LOW);
+  return loop;
+  }
+
+  if (value < 200 && randomNumber == 0)
+  {
+  randomNumber = random(4);
+  // turn LED on:  
+  digitalWrite(ledPin2, HIGH);
+  digitalWrite(ledPin1, LOW);
+  return loop;   
+  }      
+  
+        //right side
+        if (value < 200  && randomNumber == 1)
+        {
+        digitalWrite(ledPin2, HIGH);
+        digitalWrite(ledPin1, LOW);
+        delay(time); 
+        servo1.write(angle3);//ustawia przekładnię o 90 stopni !       
+        servo2.write(angle4);//ustawia przekładnię o 0 stopni !   
+        randomNumber = random(4);       
+        return loop;
+        }
+      
+      if (value < 200 && randomNumber == 2)//2 faza
+      {
+        servo1.write(angle2);//ustawia przekładnię o 90 stopni !        
+        servo2.write(angle1);//ustawia przekładnię o 0 stopni ! 
+        digitalWrite(ledPin2, HIGH);
+        digitalWrite(ledPin1, LOW);     
+        delay(time); 
+        servo1.write(angle3);//ustawia przekładnię o 90 stopni !   
+        servo2.write(angle4);//ustawia przekładnię o 0 stopni !       
+        randomNumber = random(4);        
+        return loop;  
+      }
+      
+      //left side
+      if (value < 200 && randomNumber == 3)//3 faza
+      {
+        servo2.write(angle2);//ustawia serwo lewe
+        digitalWrite(ledPin2, HIGH);
+        digitalWrite(ledPin1, LOW);
+        delay(time);            
+        servo2.write(angle4);//ustawia przekładnię o 0 stopni !        
+        randomNumber = random(4);        
+        return loop;     
+        }
+        
+        //BUTTONS 
+        // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+        if (buttonState1 == HIGH && value > 200 ) 
+        {
+        servo1.write(angle1);//ustawia przekładnię o 0 stopni !    
+        delay(500);
+        return loop;    
+        
+        }  
+        if (buttonState2 == HIGH && value > 200 ) 
+        {
+    // turn LED on or servo     
+    servo2.write(angle2);//ustawia przekładnię o 90 stopni !  
+    delay(500);
+    return loop;
+  } 
+  if (buttonState1 == LOW && buttonState2 == LOW && value > 200 )
+  {
+    // turn LED off or servo:
+    //digitalWrite(ledPin1, HIGH);
+    //digitalWrite(ledPin2, LOW);
+    servo1.write(angle3);//ustawia przekładnię o 0 stopni !
+    servo2.write(angle4);//ustawia przekładnię o 0 stopni !
+    return loop;
+   
+  //buttons end  
+} else {
+    // turn LED off or servo:
+    //digitalWrite(ledPin1, LOW);
+    //digitalWrite(ledPin2, LOW);
+    servo1.write(angle3);//ustawia przekładnię o 0 stopni !
+    servo2.write(angle4);//ustawia przekładnię o 0 stopni !
+    return loop;
+          }
+       }
+        
+      
+
+ 
+ 
